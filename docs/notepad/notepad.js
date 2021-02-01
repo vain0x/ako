@@ -1,4 +1,4 @@
-const TITLE = "Notepad"
+const TITLE = "notepad"
 
 const main = () => {
   const textAreaElement = document.getElementById("textarea")

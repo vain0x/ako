@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Set of utilities run on browser.",
   "private": true,
+  "author": "vain0x <vainzerox@gmail.com>",
+  "license": "CC0-1.0",
+  "keywords": [],
   "scripts": {
     "start": "webpack serve --mode development --content-base docs",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,8 +14,5 @@
     "webpack": "^5.19.0",
     "webpack-cli": "^4.4.0",
     "webpack-dev-server": "^3.11.2"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

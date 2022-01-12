@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text [Masked]</title>
+
+    <style>
+        body,
+        h1 {
+            margin: 0;
+        }
+
+        html {
+            font-size: 62.5%;
+        }
+
+        body,
+        button,
+        input,
+        textarea {
+            font-family: sans-serif;
+            font-size: 2rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        body,
+        main,
+        form {
+            position: relative;
+            display: flex;
+            flex-flow: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+
+            font-size: 1.4rem;
+            padding: 0.2rem 2rem;
+            background: #333;
+            color: white;
+        }
+        #github {
+            margin-left: auto;
+            text-decoration: none;
+            color: #f3f3f3;
+        }
+
+        form {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #text {
+            margin-top: 4rem;
+        }
+
+        #hide {
+            margin-top: 1.2rem;
+        }
+
+        #preview-wrapper {
+            margin-top: 4rem;
+        }
+
+        #tweet {
+            margin-top: 4rem;
+        }
+
+        #hide {
+            margin-left: auto;
+        }
+
+        #text,
+        #preview-wrapper {
+            width: 90vw;
+            padding: 1.2rem 2rem;
+        }
+
+        #text {
+            border: 0.2rem solid #bdbdbd;
+            border-radius: 1rem;
+        }
+
+        #hide {
+            padding: 1.2rem 2rem;
+            border: none;
+            border-radius: 3rem;
+            cursor: pointer;
+        }
+
+        @media screen and (min-width: 800px) {
+            #text,
+            #preview-wrapper {
+                width: 64rem;
+            }
+        }
+
+        #preview-wrapper {
+            background: #f9f9f9;
+            min-height: 4rem;
+            border-radius: 1rem;
+        }
+
+        #preview {
+            white-space: pre-wrap;
+        }
+
+        #tweet {
+            margin-left: auto;
+            margin-right: auto;
+            background: #116dc4;
+            padding: 1.2rem 4rem;
+            border-radius: 3rem;
+            text-decoration: none;
+            color: white;
+        }
+        #tweet:focus-visible {
+            outline: #333 0.2rem solid;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Text [Masked]</h1>
+        <a id="github" href="https://github.com/vain0x/army-knife-online">GitHub</a>
+    </header>
+
+    <main>
+        <form>
+            <textarea id=text type=text maxlength=280 placeholder="[What]'s happening?" autofocus rows=3></textarea>
+            <button id=hide type="button">[Mask]</button>
+            <div id="preview-wrapper">
+                <div id="preview"></div>
+            </div>
+            <a id=tweet href="https://twitter.com/intent/tweet">Tweet</a>
+        </form>
+    </main>
+
+    <script>
+        (() => {
+            const textInput = document.getElementById("text") //as HTMLInputElement
+            const hideButton = document.getElementById("hide")
+            const previewElement = document.getElementById("preview")
+            const tweetLink = document.getElementById("tweet")
+
+            const hiddenUrl = text => {
+                const url = new URL(document.location.href)
+                url.search = ""
+                url.hash = ""
+                url.searchParams.set("text", window.btoa(text))
+                return url.toString()
+            }
+
+            hideButton.addEventListener("click", () => {
+                const text = textInput.value
+                const l = textInput.selectionStart
+                const r = textInput.selectionEnd
+
+                const unmask = text[l] === "[" && text[r - 1] === "]"
+                if (unmask) {
+                    const newText = text.slice(0, l) + text.slice(l + 1, r - 1) + text.slice(r)
+                    textInput.value = newText
+                    textInput.setSelectionRange(l, r - 2)
+                    textInput.focus()
+                    update()
+                    return
+                }
+
+                const newText = text.slice(0, l) + "[" + text.slice(l, r) + "]" + text.slice(r)
+                textInput.value = newText
+                textInput.setSelectionRange(l, r + 2)
+                textInput.focus()
+                update()
+            })
+
+            const init = () => {
+                const url = new URL(document.location.search, "http://localhost")
+                const text = url.searchParams.get("text") ?? ""
+                if (text !== "") {
+                    let raw
+                    try {
+                        raw = window.atob(text)
+                    } catch (err) {
+                        //
+                    }
+                    if (raw != undefined) {
+                        textInput.value = raw
+                    }
+                }
+
+                if (textInput.value !== "") {
+                    const text = textInput.value
+                    textInput.setSelectionRange(text.length, text.length)
+                }
+            }
+
+            const update = () => {
+                const text = textInput.value
+                const hidden = text.replace(/\[(.+)\]/g, () => "**")
+                previewElement.textContent = hidden
+
+                const url = new URL("/intent/tweet", "https://twitter.com")
+                url.searchParams.set("text", hidden + " / " + hiddenUrl(text))
+                tweetLink.href = url.toString()
+            }
+
+            textInput.addEventListener("input", update)
+            textInput.addEventListener("change", update)
+
+            init()
+            update()
+        })()
+    </script>
+</body>
+
+</html>

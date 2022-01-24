@@ -1,4 +1,4 @@
-import "deps.minified.js"
+import "./deps.minified.js"
 
 const diff = window.Diff
 

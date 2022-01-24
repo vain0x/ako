@@ -100,10 +100,10 @@ document.addEventListener("drop", ev => {
 })
 
 copyButton.addEventListener("click", () => {
-  copyTextarea.removeAttribute("hidden")
-  copyTextarea.value = current
-  copyTextarea.select()
-  document.execCommand("copy")
+  navigator.clipboard.writeText(current)
+
+  copyButton.textContent = "Copied!"
+  setTimeout(() => { copyButton.textContent = "Copy" }, 1000)
 })
 
 // init

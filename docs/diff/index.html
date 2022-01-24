@@ -2,56 +2,56 @@
 <html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diff</title>
-    <link rel="stylesheet" href="index.css">
-    <script src="deps.minified.js" defer></script>
-    <script src="index.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diff</title>
+  <link rel="stylesheet" href="index.css">
+  <script src="deps.minified.js" defer></script>
+  <script src="index.js" defer></script>
 </head>
 
 <body>
-    <header>
-        <h1>Diff</h1>
-    </header>
+  <header>
+    <h1>Diff</h1>
+  </header>
 
-    <main>
-        <div class="panel">
-            <h2>
-                <div>OLD</div>
-                <input id="old-filename-input" type="text" placeholder="old.txt">
-    
-                <label class="upload-label" dropzone="copy" data-key="old">
-                    [↑] UPLOAD
-                    <input type="file" data-key="old" hidden>
-                </label>
-            </h2>
-            <textarea id="old-textarea"></textarea>
-        </div>
-    
-        <div class="panel">
-            <h2>
-                <div>NEW</div>
-                <input id="new-filename-input" type="text" placeholder="new.txt">
-    
-                <label class="upload-label" dropzone="copy" data-key="new">
-                    [↑] UPLOAD
-                    <input type="file" data-key="new" hidden>
-                </label>
-            </h2>
-            <textarea id="new-textarea"></textarea>
-        </div>
-    
-        <div class="panel">
-            <h2>
-                <div>DIFF</div>
-                <button id="copy-button" type="button">COPY</button>
-            </h2>
-    
-            <div id="diff"></div>
-            <textarea id="copy-textarea" hidden></textarea>
-        </div>
-    </main>
+  <main>
+    <div class="panel">
+      <h2>
+        <div>OLD</div>
+        <input id="old-filename-input" type="text" placeholder="old.txt">
+
+        <label class="upload-label" dropzone="copy" data-key="old">
+          [↑] UPLOAD
+          <input type="file" data-key="old" hidden>
+        </label>
+      </h2>
+      <textarea id="old-textarea"></textarea>
+    </div>
+
+    <div class="panel">
+      <h2>
+        <div>NEW</div>
+        <input id="new-filename-input" type="text" placeholder="new.txt">
+
+        <label class="upload-label" dropzone="copy" data-key="new">
+          [↑] UPLOAD
+          <input type="file" data-key="new" hidden>
+        </label>
+      </h2>
+      <textarea id="new-textarea"></textarea>
+    </div>
+
+    <div class="panel">
+      <h2>
+        <div>DIFF</div>
+        <button id="copy-button" type="button">COPY</button>
+      </h2>
+
+      <div id="diff"></div>
+      <textarea id="copy-textarea" hidden></textarea>
+    </div>
+  </main>
 </body>
 
 </html>

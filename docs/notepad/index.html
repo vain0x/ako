@@ -4,41 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>notepad</title>
-
-    <style>
-        html,
-        body {
-            margin: 0;
-            height: 100%;
-        }
-
-        html {
-            font-size: 62.5%;
-            line-height: 1.5;
-        }
-
-        body,
-        textarea {
-            font-family: 'JetBrains Mono', monospace, monospace;
-            font-size: 1.6rem;
-        }
-
-        #textarea {
-            display: block;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-
-            margin: 0;
-            padding: 1.2rem;
-
-            background: #fcfcff;;
-            border: none;
-            color: #212121;
-        }
-    </style>
-
-    <script src="notepad.js"></script>
+    <link rel="stylesheet" href="notepad.css">
+    <script src="notepad.js" defer></script>
 </head>
 <body>
     <textarea id="textarea" autofocus></textarea>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja" class="grid">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'">
+  <title>dict</title>
+  <link rel="stylesheet" href="dict.css">
+  <script type="module" src="dict.js"></script>
+</head>
+
+<body class="grid">
+  <div id="app" class="grid" style="grid-template-rows: 1fr auto">
+    <div id="entry-grid" class="grid" style="grid-auto-rows: auto; grid-template-columns: auto auto 1fr; place-content: start"></div>
+
+    <footer class="grid" style="position: sticky; bottom: 0; padding: 2px 8px; border-top: 1px solid #bdbdbd">
+      <form id="add-form" class="grid" style="padding-top: 4px; grid-template-columns: 1fr 1fr auto; gap: 8px" autocomplete="off">
+        <div class="grid" style="grid-template-columns: 1fr auto; gap: 2px">
+          <label id="new-key-label" class="grid">
+            <input type="text" id="new-key-input" size="8" required>
+          </label>
+          <button type="button" id="new-key-speak-button" class="speak-button"></button>
+        </div>
+
+        <div class="grid" style="grid-template-columns: 1fr auto; gap: 2px">
+          <label id="new-value-label" class="grid">
+            <input type="text" id="new-value-input" size="8" required>
+          </label>
+          <button type="button" id="new-value-speak-button" class="speak-button"></button>
+        </div>
+
+        <button style="appearance: unset; width: 30px; height: 30px; background: #6666ff; border: none; border-radius: 1000px; color: white; font-weight: bold">
+          +
+        </button>
+      </form>
+    </footer>
+  </div>
+
+</body>
+
+</html>

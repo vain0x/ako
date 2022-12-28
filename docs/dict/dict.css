@@ -1,0 +1,113 @@
+*, *::before, *::after { box-sizing: border-box }
+html, body { margin: 0 }
+html { min-height: 100% }
+
+button,
+input,
+textarea {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+
+#app {
+    margin: 8px;
+}
+
+@media (min-width: 400px) {
+    body { background: #fcfcfc }
+
+    #app {
+        margin-inline: auto;
+        background: white;
+        width: 400px;
+    }
+
+    #entry-grid {
+        margin: 16px;
+    }
+}
+
+input,
+textarea {
+    font-family: "JetBrains Mono", "Cascadia Mono", monospace;
+}
+
+
+
+.block { display: block }
+.grid { display: grid }
+.v-stack { display: grid; grid-auto-flow: column; grid-auto-columns: auto }
+.h-stack { display: grid; grid-auto-flow: row; grid-auto-rows: auto }
+.p-4 { padding: 4px }
+.border { border: 1px solid #bdbdbd }
+.relative { position: relative }
+
+
+.cell { padding: 4px 8px; border-bottom: 1px solid #bdbdbd }
+.row-button { appearance: unset; padding-inline: 8px; background: white; border: 1px solid #bdbdbd; border-radius: 8px; }
+.row-button::before { content: "詳細" }
+
+
+
+footer label {
+    position: relative;
+}
+
+footer input {
+    margin-top: 10px;
+    padding: 2px;
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    color: #4d4d4d;
+}
+
+#new-key-label::before,
+#new-value-label::before {
+    font-size: 12px;
+    position: absolute;
+    left: 2px; top: -8px;
+    color: #d8d8d8;
+}
+#new-key-label::before { content: "key" }
+#new-value-label::before { content: "value" }
+
+.speak-button {
+    appearance: unset;
+    align-self: end;
+    background: none;
+    border: none;
+    padding: 4px;
+
+    display: grid;
+    place-items: center;
+}
+.speak-button::before {
+    content: "🎤";
+}
+.speak-button[data-speaking]::before {
+    content: "🎶";
+}
+.speak-button[data-waiting] {
+    outline: 3px dashed #4dff4d;
+}
+
+body:not([data-speech-recognition]) .speak-button {
+    opacity: 0.4;
+}
+
+/*
+dialog {
+    position: fixed;
+    left: 0; top: 0;
+    width: 100%;
+    min-height: 100%;
+
+    background: #00000029;
+}
+
+dialog:not([open]) {
+    content-visibility: hidden;
+} */

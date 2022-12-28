@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -eu
+
+if ! http-server --help >/dev/null
+then
+    echo 'Do: npm install -g http-server'
+    exit 1
+fi
+
+if ! test -f assets/server.cert
+then
+    echo 'Generating certification'
+    mkdir -p assets
+
+    openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 \
+    -subj "/C=JP/ST=Example/L=Example/O=Example/CN=example.com" \
+    -keyout assets/server.key \
+    -out assets/server.cert
+fi
+
+# -c-1: no cache
+http-server ./docs -c-1 -S -K assets/server.key -C assets/server.cert -o /

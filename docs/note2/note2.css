@@ -1,0 +1,30 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+textarea {
+    font-family: 'JetBrains Mono', 'Biz UDGothic', monospace, monospace;
+}
+
+#textarea {
+    display: block;
+    width: calc(100% - 4px);
+
+    margin: 0;
+    padding: 1.2rem;
+
+    background: #FCFCFF;
+    border: 1px solid #BDBDBD;
+    color: #272727;
+}

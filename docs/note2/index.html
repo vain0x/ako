@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com">
+  <title>note2</title>
+  <link rel="stylesheet" href="note2.css">
+  <script type="module" src="note2.js" defer></script>
+</head>
+
+<body style="padding: 4px; display: grid; grid-template-rows: auto 1fr; gap: 4px">
+  <div style="height: 22px; margin-block: 4px; display: flex; gap: 4px">
+    <button id="load-button" type="button">Load</button>
+    <button id="save-button" type="button">Save</button>
+    <button id="settings-button" type="button">Settings</button>
+    <div id="status" style="font-family: monospace; color: #4D4D4D"></div>
+  </div>
+  <textarea id="textarea" autofocus></textarea>
+
+  <dialog id="settings-dialog">
+    <h2>Settings</h2>
+    <form id="settings-form" style="display: flex; flex-flow: column; gap: 8px">
+      <label class="display: flex; gap: 4px">
+        <div>accessToken</div>
+        <input type="text" name="accessToken">
+      </label>
+      <label class="display: flex; gap: 4px">
+        <div>owner</div>
+        <input type="text" name="owner">
+      </label>
+      <label class="display: flex; gap: 4px">
+        <div>repo</div>
+        <input type="text" name="repo">
+      </label>
+      <label class="display: flex; gap: 4px">
+        <div>path</div>
+        <input type="text" name="path">
+      </label>
+      <label class="display: flex; gap: 4px">
+        <div>branch</div>
+        <input type="text" name="branch">
+      </label>
+
+      <div style="display: flex; gap: 4px">
+        <button id="settings-close-button" type="button" style="width: 80px; height: 25px">
+          Close
+        </button>
+
+        <button style="width: 80px; height: 25px">
+          Save
+        </button>
+
+        <div id="settings-status"></div>
+      </div>
+    </form>
+  </dialog>
+</body>
+
+</html>

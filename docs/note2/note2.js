@@ -1,18 +1,7 @@
 const TITLE = "note2"
-const storage = window.localStorage
 const events = new EventTarget()
 
-const loadSettings = () => {
-  return {
-    accessToken: storage.getItem("gh.accessToken") || "",
-    owner: storage.getItem("gh.owner") || "",
-    repo: storage.getItem("gh.repo") || "",
-    path: storage.getItem("gh.path") || "",
-    branch: storage.getItem("gh.branch") || "",
-  }
-}
-
-let settings = loadSettings()
+const DRY = false
 
 // -----------------------------------------------
 // util
@@ -32,21 +21,64 @@ function bytesToBase64(bytes) {
 }
 
 // -----------------------------------------------
-// settings dialog
+// settings
 // -----------------------------------------------
 
-const settingsDialogsEl = document.getElementById("settings-dialog")
+const storage = window.localStorage
+
+const loadSettings = () => {
+  return {
+    autosave: storage.getItem("note2.autosave") === "1",
+    accessToken: storage.getItem("gh.accessToken") || "",
+    owner: storage.getItem("gh.owner") || "",
+    repo: storage.getItem("gh.repo") || "",
+    path: storage.getItem("gh.path") || "",
+    branch: storage.getItem("gh.branch") || "",
+  }
+}
+
+let settings = loadSettings()
+let isSettingsDirty = false
+
+// -----------------------------------------------
+// control dialog
+// -----------------------------------------------
+
+const controlDialogEl = document.getElementById("control-dialog")
 
 const computeSettingsSummary = () => {
   return `github.com@${settings.accessToken ? "**" : ""}:${settings.owner || "_"}/${settings.repo || "_"}/${settings.path || "_"}?ref=${settings.branch || "_"}`
 }
 
+const setSettingsToForm = () => {
+  const autosaveEl = document.getElementsByName("autosave")[0]
+  autosaveEl.checked = settings.autosave
+
+  for (const name of [
+    "accessToken",
+    "owner",
+    "repo",
+    "path",
+    "branch",
+  ]) {
+    const el = document.getElementsByName(name)[0]
+    el.value = settings[name]
+  }
+}
+
 const saveSettings = () => {
   const get = name => {
-    console.log("get", name, [...document.getElementsByName(name)])
     return document.getElementsByName(name)[0].value.trimEnd() || ""
   }
+  const set = (key, value) => {
+    if (value) {
+      storage.setItem(key, value)
+    } else {
+      storage.removeItem(key)
+    }
+  }
   const obj = {
+    autosave: document.getElementsByName("autosave")[0].checked,
     accessToken: get("accessToken"),
     owner: get("owner"),
     repo: get("repo"),
@@ -54,14 +86,18 @@ const saveSettings = () => {
     branch: get("branch"),
   }
 
-  for (const [name, value] of Object.entries(obj)) {
-    if (value) {
-      storage.setItem(`gh.${name}`, value)
-    } else {
-      storage.removeItem(`gh.${name}`)
-    }
+  set("note2.autosave", obj.autosave ? "1" : "")
+  for (const name of [
+    "accessToken",
+    "owner",
+    "repo",
+    "path",
+    "branch",
+  ]) {
+    set(`gh.${name}`, obj[name])
   }
   settings = obj
+  isSettingsDirty = true
   events.dispatchEvent(new Event("settingsChanged"))
 }
 
@@ -72,7 +108,11 @@ const saveSettings = () => {
 let lastSha
 let lastContents
 
-export const fetchContents = async () => {
+const textEl = document.getElementById("textarea")
+
+const fetchContents = async () => {
+  if (DRY) return await new Promise(resolve => setTimeout(() => resolve("fetched contents: " + ((new Date()).toLocaleString())), 1000))
+
   // curl -L \
   //   -H "Accept: application/vnd.github+json" \
   //   -H "Authorization: Bearer $TOKEN" \
@@ -116,6 +156,8 @@ export const fetchContents = async () => {
 }
 
 const fetchUpload = async value => {
+  if (DRY) return await new Promise(resolve => setTimeout(resolve, 1000))
+
   // curl -L \
   // -X PUT \
   // -H "Accept: application/vnd.github+json" \
@@ -173,27 +215,80 @@ const fetchUpload = async value => {
   }
 }
 
-// let dirty = false
+const performLoad = () => {
+  showStatus("loading...")
+  !(async () => {
+    try {
+      const contents = await fetchContents()
+      textEl.value = contents
+      textEl.focus()
+    } catch (err) {
+      showStatus("ERROR")
+      throw err
+    }
+  })()
+}
 
-// const triggerAutoSave = () => {
-//   if (!dirty) {
-//     document.title = `${TITLE}*`
-//     dirty = true
+const performSave = () => {
+  const contents = textEl.value.trimEnd()
+  console.log("contents", contents)
+  if (contents === lastContents) {
+    showStatus("no change")
+    return
+  }
 
-//     setTimeout(() => {
-//       if (dirty) {
-//         save()
-//         document.title = TITLE
-//         dirty = false
-//       }
-//     }, 300)
-//   }
-// }
+  showStatus("saving...")
+  !(async () => {
+    try {
+      await fetchUpload(contents)
+      showStatus("saved")
+    } catch (err) {
+      showStatus("ERROR")
+      throw err
+    }
+  })()
+}
 
-// textAreaElement.addEventListener("input", triggerAutoSave)
+let currentAutosave = null
+
+const handleInputWhenAutoSave = () => {
+  let titleOrig
+  if (currentAutosave) {
+    console.log("autosave recreate")
+    titleOrig = currentAutosave.titleOrig
+    currentAutosave.dispose()
+  } else {
+    titleOrig = document.title
+    document.title = `${titleOrig}*`
+  console.log("autosave start")
+  }
+
+  const flush = () => {
+    console.log("autosave flush")
+    document.title = titleOrig
+    currentAutosave = null
+    dispose()
+    performSave()
+  }
+
+  const dispose = () => {
+    clearTimeout(timeout)
+    document.removeEventListener("visibilitychange", handleVisibilityChange)
+  }
+  const timeout = setTimeout(flush, 3 * 1000)
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      flush()
+    }
+  }
+  document.addEventListener("visibilitychange", handleVisibilityChange)
+
+  currentAutosave = { titleOrig, dispose }
+}
 
 let statusTimeout
-const setStatus = message => {
+const showStatus = message => {
   const el = document.getElementById("status")
   el.textContent = message
   if (statusTimeout) clearTimeout(statusTimeout)
@@ -205,61 +300,55 @@ const setStatus = message => {
 
 // init
 {
-  const textEl = document.getElementById("textarea")
-
-  document.getElementById("load-button").addEventListener("click", () => {
-    setStatus("loading...")
-    !(async () => {
-      try {
-        const contents = await fetchContents()
-        textEl.textContent = contents
-        textEl.focus()
-      } catch (err) {
-        setStatus("ERROR")
-        throw err
-      }
-    })()
+  const loadButtonEl = document.getElementById("load-button")
+  loadButtonEl.addEventListener("click", () => {
+    performLoad()
   })
 
-  document.getElementById("save-button").addEventListener("click", () => {
-    const contents = textEl.value.trimEnd()
-    console.log("contents", contents)
-    if (contents === lastContents) {
-      setStatus("no change")
-      return
-    }
-
-    setStatus("saving...")
-    !(async () => {
-      try {
-        await fetchUpload(contents)
-        setStatus("saved")
-      } catch (err) {
-        setStatus("ERROR")
-        throw err
-      }
-    })()
+  const saveButtonEl = document.getElementById("save-button")
+  saveButtonEl.addEventListener("click", () => {
+    performSave()
   })
 
-  document.getElementById("settings-button").addEventListener("click", () => {
-    for (const [name, value] of Object.entries(settings)) {
-      const el = document.getElementsByName(name)[0]
-      el.value = value
-    }
-    settingsDialogsEl.showModal()
+  document.getElementById("control-button").addEventListener("click", () => {
+    setSettingsToForm()
+    controlDialogEl.showModal()
   })
 
-  document.getElementById("settings-close-button").addEventListener("click", () => {
-    settingsDialogsEl.close()
+  document.getElementById("control-close-button").addEventListener("click", () => {
+    controlDialogEl.close()
   })
 
   const settingsFormEl = document.getElementById("settings-form")
   settingsFormEl.addEventListener("submit", ev => {
     ev.preventDefault()
     saveSettings()
-    settingsDialogsEl.close()
-    setStatus(computeSettingsSummary(settings))
+    controlDialogEl.close()
+    update()
   })
 
-  setStatus(computeSettingsSummary(settings))
+  let init = true
+
+  const update = () => {
+    if (init || isSettingsDirty) {
+      loadButtonEl.hidden = settings.autosave
+      saveButtonEl.hidden = settings.autosave
+
+      showStatus(computeSettingsSummary(settings))
+
+      if (settings.autosave) {
+        textEl.addEventListener("input", handleInputWhenAutoSave)
+      } else {
+        textEl.removeEventListener("input", handleInputWhenAutoSave)
+      }
+    }
+    if (!isSettingsDirty) {
+      currentAutosave?.dispose()
+    }
+
+    init = false
+    isSettingsDirty = false
+  }
+
+  update()
 }

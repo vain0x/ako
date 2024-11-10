@@ -26,7 +26,7 @@ const storage = window.localStorage
 
 let lastSha = storage.getItem("note2.lastSha") || null
 let lastContents = storage.getItem("note2.lastContents") || null
-let isSaved = true
+let isSaved = !storage.getItem("note2.unsavedContents")
 
 let settings = {
   autosave: storage.getItem("note2.autosave") === "1",
@@ -52,11 +52,9 @@ window.addEventListener("unhandledrejection", ev => {
 })
 
 const markAsSaved = () => {
-  if (!isSaved) {
-    isSaved = true
-    document.title = TITLE
-    storage.removeItem("note2.unsavedContents")
-  }
+  isSaved = true
+  document.title = TITLE
+  storage.removeItem("note2.unsavedContents")
 }
 const markAsUnsaved = () => {
   isSaved = false
@@ -154,7 +152,8 @@ const fetchUpload = async value => {
         "Accept": "application/vnd.github+json",
         "Authorization": `Bearer ${accessToken}`,
         "X-GitHub-Api-Version": "2022-11-28",
-      }
+      },
+      keepalive: true
     })
     if (!res.ok) {
       console.log("res", res.status)
@@ -225,7 +224,7 @@ const showStatus = message => {
 
 let currentAutosave
 const textEl = document.getElementById("textarea")
-textEl.value = lastContents || ""
+textEl.value = storage.getItem("note2.unsavedContents") || lastContents || ""
 textEl.addEventListener("input", () => {
   markAsUnsaved()
 
@@ -245,7 +244,7 @@ textEl.addEventListener("input", () => {
       clearTimeout(timeout)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
-    const timeout = setTimeout(flush, 1000)
+    const timeout = setTimeout(flush, 3 * 1000)
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -333,12 +332,9 @@ settingsFormEl.addEventListener("submit", ev => {
 })
 
 const handleInitOrSettingsChanged = () => {
-  loadButtonEl.hidden = settings.autosave
-  saveButtonEl.hidden = settings.autosave
-
   showStatus(computeSettingsSummary(settings))
 
-  if (settings.autosave && !lastSha) {
+  if (settings.autosave) {
     performLoad()
   }
 }
